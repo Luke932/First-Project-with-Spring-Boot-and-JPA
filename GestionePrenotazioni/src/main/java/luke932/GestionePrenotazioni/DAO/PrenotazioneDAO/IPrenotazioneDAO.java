@@ -22,8 +22,8 @@ public interface IPrenotazioneDAO {
 
 	public List<Prenotazione> findByDataPrenotazione(LocalDate dataPrenotazione);
 
-	public List<Prenotazione> findByUtente(Utente utente);
+	public Prenotazione findByUtente(Utente utente);
 
-	public List<Prenotazione> findByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione);
+	public Prenotazione findByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione);
 
 }

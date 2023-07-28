@@ -13,7 +13,7 @@ public interface PrenotazioneRepository extends JpaRepository<Prenotazione, Long
 
 	List<Prenotazione> findByDataPrenotazione(LocalDate dataPrenotazione);
 
-	List<Prenotazione> findByUtente(Utente utente);
+	Prenotazione findFirstByUtente(Utente utente);
 
-	List<Prenotazione> findByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione);
+	Prenotazione findFirstByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione);
 }

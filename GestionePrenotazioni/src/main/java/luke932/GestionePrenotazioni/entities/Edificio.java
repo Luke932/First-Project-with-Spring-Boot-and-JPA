@@ -3,6 +3,7 @@ package luke932.GestionePrenotazioni.entities;
 import java.util.List;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -22,7 +23,7 @@ public class Edificio {
 
 	private String città;
 
-	@OneToMany(mappedBy = "edificio")
+	@OneToMany(mappedBy = "edificio", fetch = FetchType.EAGER)
 	private List<Postazione> postazioni;
 
 }

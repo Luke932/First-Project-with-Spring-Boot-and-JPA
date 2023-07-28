@@ -69,13 +69,13 @@ public class PrenotazioneService implements IPrenotazioneDAO {
 	}
 
 	@Override
-	public List<Prenotazione> findByUtente(Utente utente) {
-		return prnR.findByUtente(utente);
+	public Prenotazione findByUtente(Utente utente) {
+		return prnR.findFirstByUtente(utente);
 	}
 
 	@Override
-	public List<Prenotazione> findByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione) {
-		return prnR.findByPostazioneAndDataPrenotazione(postazione, dataPrenotazione);
+	public Prenotazione findByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione) {
+		return prnR.findFirstByPostazioneAndDataPrenotazione(postazione, dataPrenotazione);
 	}
 
 }

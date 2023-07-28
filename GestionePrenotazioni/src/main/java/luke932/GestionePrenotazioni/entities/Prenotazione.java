@@ -29,4 +29,9 @@ public class Prenotazione {
 
 	@Temporal(TemporalType.DATE)
 	private LocalDate dataPrenotazione;
+
+	@Override
+	public String toString() {
+		return "Prenotazione [id=" + id + ", dataPrenotazione=" + dataPrenotazione + "]";
+	}
 }
