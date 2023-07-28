@@ -17,4 +17,6 @@ public interface IUtenteDAO {
 	public List<Utente> findAll();
 
 	public long count();
+
+	public Utente findByUsername(String username);
 }
