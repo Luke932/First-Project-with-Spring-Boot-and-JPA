@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import luke932.GestionePrenotazioni.entities.Postazione;
 import luke932.GestionePrenotazioni.entities.Prenotazione;
 import luke932.GestionePrenotazioni.entities.Utente;
+import luke932.GestionePrenotazioni.exceptions.DateNotPossibleException;
 import luke932.GestionePrenotazioni.exceptions.ItemNotFoundException;
 
 @Service
@@ -20,6 +21,13 @@ public class PrenotazioneService implements IPrenotazioneDAO {
 	private PrenotazioneRepository prnR;
 
 	public void save(Prenotazione prenotazione) {
+		LocalDate dataPrenotazione = prenotazione.getDataPrenotazione();
+		List<Prenotazione> prenotazioniConStessaData = prnR.findByDataPrenotazione(dataPrenotazione);
+
+		if (!prenotazioniConStessaData.isEmpty()) {
+			throw new DateNotPossibleException(dataPrenotazione);
+		}
+
 		prnR.save(prenotazione);
 		log.info(prenotazione.toString());
 	}
