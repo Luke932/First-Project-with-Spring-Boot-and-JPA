@@ -20,7 +20,7 @@ public class PrenotazioneService implements IPrenotazioneDAO {
 	@Autowired
 	private PrenotazioneRepository prnR;
 
-	public void save(Prenotazione prenotazione) {
+	public void save(Prenotazione prenotazione) throws DateNotPossibleException {
 		LocalDate dataPrenotazione = prenotazione.getDataPrenotazione();
 		List<Prenotazione> prenotazioniConStessaData = prnR.findByDataPrenotazione(dataPrenotazione);
 
