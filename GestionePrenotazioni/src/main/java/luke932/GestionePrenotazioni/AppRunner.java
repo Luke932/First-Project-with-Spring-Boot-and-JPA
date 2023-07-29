@@ -2,37 +2,40 @@ package luke932.GestionePrenotazioni;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
-import luke932.GestionePrenotazioni.DAO.EdificioDAO.EdificioRepository;
-import luke932.GestionePrenotazioni.DAO.PostazioneDAO.PostazioneRepository;
-import luke932.GestionePrenotazioni.DAO.PrenotazioneDAO.PrenotazioneRepository;
-import luke932.GestionePrenotazioni.DAO.UtenteDAO.UtenteRepository;
+import luke932.GestionePrenotazioni.DAO.EdificioDAO.EdificioService;
+import luke932.GestionePrenotazioni.DAO.PostazioneDAO.PostazioneService;
+import luke932.GestionePrenotazioni.DAO.PrenotazioneDAO.PrenotazioneService;
+import luke932.GestionePrenotazioni.DAO.UtenteDAO.UtenteService;
 import luke932.GestionePrenotazioni.entities.Postazione;
 import luke932.GestionePrenotazioni.entities.Prenotazione;
 import luke932.GestionePrenotazioni.entities.TipoPostazione;
 import luke932.GestionePrenotazioni.entities.Utente;
+import luke932.GestionePrenotazioni.exceptions.ItemNotFoundException;
 
 @Component
 @Slf4j
 public class AppRunner implements CommandLineRunner {
 
 	@Autowired
-	private PostazioneRepository pstR;
+	private PostazioneService pstR;
 
 	@Autowired
-	private EdificioRepository edfR;
+	private EdificioService edfR;
 
 	@Autowired
-	private UtenteRepository utnR;
+	private UtenteService utnR;
 
 	@Autowired
-	private PrenotazioneRepository prnR;
+	private PrenotazioneService prnR;
 
 	@Autowired
 	private AppConfig app;
@@ -40,29 +43,25 @@ public class AppRunner implements CommandLineRunner {
 	@Override
 	@Transactional
 	public void run(String... args) throws Exception {
-		// ===================SAVE
-		edfR.save(app.edificio1());
-		log.info("Edificio con nome ->" + " " + app.edificio1().getNome() + " " + "salvato!");
-		edfR.save(app.edificio2());
-		log.info("Edificio con nome ->" + " " + app.edificio2().getNome() + " " + "salvato!");
+		try {
+			edfR.save(app.edificio1());
+			edfR.save(app.edificio2());
 
-		pstR.save(app.postazione1());
-		log.info("Postazione con codice ->" + " " + app.postazione1().getCodice() + " " + "salvata");
-		pstR.save(app.postazione2());
-		log.info("Postazione con codice ->" + " " + app.postazione2().getCodice() + " " + "salvata");
+			pstR.save(app.postazione1());
+			pstR.save(app.postazione2());
 
-		utnR.save(app.utente1());
-		log.info("Utente con nome ->" + " " + app.utente1().getNomeCompleto() + " " + "salvato!");
-		utnR.save(app.utente2());
-		log.info("Utente con nome ->" + " " + app.utente2().getNomeCompleto() + " " + "salvato!");
+			utnR.save(app.utente1());
+			utnR.save(app.utente2());
 
-		prnR.save(app.prenotazione1());
-		log.info("Prenotazione con id ->" + " " + app.prenotazione1().getId() + " " + "salvato!");
-		prnR.save(app.prenotazione2());
-		log.info("Prenotazione con id ->" + " " + app.prenotazione2().getId() + " " + "salvato!");
+			prnR.save(app.prenotazione1());
+			prnR.save(app.prenotazione2());
+		} catch (DataIntegrityViolationException e) {
+			handleDataIntegrityViolationException(e);
+		} catch (ItemNotFoundException e) {
+			handleItemNotFoundException(e);
+		}
 
-		// ================RICERCA UTENTE
-		List<Postazione> postazioniByTipoAndCittà = pstR.findByTipoAndEdificioCittà(TipoPostazione.OPENSPACE, "Milano");
+		List<Postazione> postazioniByTipoAndCittà = pstR.findByTipoandEdificioCittà(TipoPostazione.OPENSPACE, "Milano");
 		if (!postazioniByTipoAndCittà.isEmpty()) {
 			Postazione uno = postazioniByTipoAndCittà.get(0);
 			log.info(uno.toString());
@@ -81,18 +80,32 @@ public class AppRunner implements CommandLineRunner {
 			log.info("Nessuna prenotazione trovata per la data specificata.");
 		}
 
-		Utente utente = app.utente1();
-		Prenotazione prenotazione = prnR.findFirstByUtente(utente);
-		if (prenotazione != null) {
-			log.info(prenotazione.toString());
-		} else {
-			log.info("Nessuna prenotazione trovata per l'utente specificato.");
+		try {
+			Utente utente = utnR.findById(1L);
+			Optional<Prenotazione> prenotazione = prnR.findByUtente(utente);
+			if (prenotazione.isPresent()) {
+				log.info(prenotazione.get().toString());
+			} else {
+				log.info("Nessuna prenotazione trovata per l'utente specificato.");
+			}
+
+			Postazione post = pstR.findById(1202L);
+			Optional<Prenotazione> due2 = prnR.findByPostazioneAndDataPrenotazione(post, LocalDate.of(2023, 5, 30));
+			if (due2.isPresent()) {
+				log.info(due2.get().toString());
+			} else {
+				log.info("Nessuna prenotazione trovata per la postazione e data specificate.");
+			}
+		} catch (ItemNotFoundException e) {
+			handleItemNotFoundException(e);
 		}
-
-		Prenotazione due2 = (Prenotazione) prnR.findFirstByPostazioneAndDataPrenotazione(app.postazione1(),
-				LocalDate.of(2023, 5, 30));
-		log.info(due2.toString());
-
 	}
 
+	private void handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+		log.error("Errore di chiave duplicata: " + e.getMessage());
+	}
+
+	private void handleItemNotFoundException(ItemNotFoundException e) {
+		log.error("Errore: " + e.getMessage());
+	}
 }

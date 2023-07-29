@@ -2,6 +2,7 @@ package luke932.GestionePrenotazioni.DAO.PrenotazioneDAO;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,12 @@ public class PrenotazioneService implements IPrenotazioneDAO {
 
 	public void save(Prenotazione prenotazione) throws DateNotPossibleException {
 		LocalDate dataPrenotazione = prenotazione.getDataPrenotazione();
-		List<Prenotazione> prenotazioniConStessaData = prnR.findByDataPrenotazione(dataPrenotazione);
+		Utente utente = prenotazione.getUtente();
 
-		if (!prenotazioniConStessaData.isEmpty()) {
+		Optional<Prenotazione> existingPrenotazione = prnR.findFirstByUtenteAndDataPrenotazione(utente,
+				dataPrenotazione);
+
+		if (existingPrenotazione.isPresent()) {
 			throw new DateNotPossibleException(dataPrenotazione);
 		}
 
@@ -69,13 +73,14 @@ public class PrenotazioneService implements IPrenotazioneDAO {
 	}
 
 	@Override
-	public Prenotazione findByUtente(Utente utente) {
-		return prnR.findFirstByUtente(utente);
+	public Optional<Prenotazione> findByUtente(Utente utente) {
+		return Optional.of(prnR.findFirstByUtente(utente).orElse(null));
 	}
 
 	@Override
-	public Prenotazione findByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione) {
-		return prnR.findFirstByPostazioneAndDataPrenotazione(postazione, dataPrenotazione);
+	public Optional<Prenotazione> findByPostazioneAndDataPrenotazione(Postazione postazione,
+			LocalDate dataPrenotazione) {
+		return Optional.of(prnR.findFirstByPostazioneAndDataPrenotazione(postazione, dataPrenotazione).orElse(null));
 	}
 
 }

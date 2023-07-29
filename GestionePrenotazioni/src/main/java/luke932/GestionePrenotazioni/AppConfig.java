@@ -2,9 +2,11 @@ package luke932.GestionePrenotazioni;
 
 import java.time.LocalDate;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import luke932.GestionePrenotazioni.DAO.PostazioneDAO.PostazioneService;
 import luke932.GestionePrenotazioni.entities.Edificio;
 import luke932.GestionePrenotazioni.entities.Postazione;
 import luke932.GestionePrenotazioni.entities.Prenotazione;
@@ -14,26 +16,35 @@ import luke932.GestionePrenotazioni.entities.Utente;
 @Configuration
 public class AppConfig {
 
+	@Autowired
+	private PostazioneService posS;
+
+	private Postazione createPostazione(String codice, String descrizione, TipoPostazione tipo,
+			int numeroMassimoOccupanti, Edificio edificio) {
+		Postazione existingPostazione = posS.findByCodice(codice);
+		if (existingPostazione != null) {
+			System.out.println("Postazione con codice " + codice + " già presente nel database.");
+			return existingPostazione;
+		} else {
+			Postazione postazione = new Postazione();
+			postazione.setCodice(codice);
+			postazione.setDescrizione(descrizione);
+			postazione.setTipo(tipo);
+			postazione.setNumeroMassimoOccupanti(numeroMassimoOccupanti);
+			postazione.setEdificio(edificio);
+			posS.save(postazione);
+			return postazione;
+		}
+	}
+
 	@Bean
 	public Postazione postazione1() {
-		Postazione postazione = new Postazione();
-		postazione.setCodice("POST-001");
-		postazione.setDescrizione("Postazione Privata");
-		postazione.setTipo(TipoPostazione.PRIVATO);
-		postazione.setNumeroMassimoOccupanti(1);
-		postazione.setEdificio(edificio1());
-		return postazione;
+		return createPostazione("POST-001", "Postazione Privata", TipoPostazione.PRIVATO, 1, edificio1());
 	}
 
 	@Bean
 	public Postazione postazione2() {
-		Postazione postazione = new Postazione();
-		postazione.setCodice("POST-002");
-		postazione.setDescrizione("Postazione Open Space");
-		postazione.setTipo(TipoPostazione.OPENSPACE);
-		postazione.setNumeroMassimoOccupanti(4);
-		postazione.setEdificio(edificio2());
-		return postazione;
+		return createPostazione("POST-002", "Postazione Open Space", TipoPostazione.OPENSPACE, 4, edificio2());
 	}
 
 	@Bean

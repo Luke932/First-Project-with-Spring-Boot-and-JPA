@@ -2,6 +2,7 @@ package luke932.GestionePrenotazioni.DAO.PrenotazioneDAO;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import luke932.GestionePrenotazioni.entities.Postazione;
 import luke932.GestionePrenotazioni.entities.Prenotazione;
@@ -22,8 +23,9 @@ public interface IPrenotazioneDAO {
 
 	public List<Prenotazione> findByDataPrenotazione(LocalDate dataPrenotazione);
 
-	public Prenotazione findByUtente(Utente utente);
+	public Optional<Prenotazione> findByUtente(Utente utente);
 
-	public Prenotazione findByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione);
+	public Optional<Prenotazione> findByPostazioneAndDataPrenotazione(Postazione postazione,
+			LocalDate dataPrenotazione);
 
 }

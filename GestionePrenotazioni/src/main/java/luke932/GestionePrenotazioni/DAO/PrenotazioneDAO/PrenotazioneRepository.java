@@ -2,6 +2,7 @@ package luke932.GestionePrenotazioni.DAO.PrenotazioneDAO;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,7 +14,10 @@ public interface PrenotazioneRepository extends JpaRepository<Prenotazione, Long
 
 	List<Prenotazione> findByDataPrenotazione(LocalDate dataPrenotazione);
 
-	Prenotazione findFirstByUtente(Utente utente);
+	Optional<Prenotazione> findFirstByUtente(Utente utente);
 
-	Prenotazione findFirstByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione);
+	Optional<Prenotazione> findFirstByPostazioneAndDataPrenotazione(Postazione postazione, LocalDate dataPrenotazione);
+
+	Optional<Prenotazione> findFirstByUtenteAndDataPrenotazione(Utente utente, LocalDate dataPrenotazione);
+
 }
