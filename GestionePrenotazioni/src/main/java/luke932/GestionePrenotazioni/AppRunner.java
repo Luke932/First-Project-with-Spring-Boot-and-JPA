@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import luke932.GestionePrenotazioni.DAO.EdificioDAO.EdificioService;
@@ -41,7 +40,6 @@ public class AppRunner implements CommandLineRunner {
 	private AppConfig app;
 
 	@Override
-	@Transactional
 	public void run(String... args) throws Exception {
 		try {
 			edfR.save(app.edificio1());
